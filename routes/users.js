@@ -40,9 +40,60 @@ router.post('/login',function(req,res){
       res.render('zyerror',err);
     }else{
       console.log('当前登录的用户信息是'+data);
+      //写cookie
+      res.cookie('username',data.username,{
+        maxAge:1000*60*60*24
+      });
+      res.cookie('nickname',data.nickname,{
+        maxAge:1000*60*60*24
+      });
+      res.cookie('is_admin',data.is_admin,{
+        maxAge:1000*60*60*24
+      });
       res.redirect('/');
     }
   });
+});
+
+
+//退出登录
+router.get('/logout',function(req,res){
+  //删除cookie
+  res.clearCookie('username');
+  res.clearCookie("nickname");
+  res.clearCookie("is_admin");
+  //跳转到登录页面
+  // res.redirect('/login.html');
+  res.send('<script>location.replace("/")</script>');
+});
+
+
+//根据昵称搜索
+router.post('/search',function(req,res){
+  let page=req.query.page || 1;
+  let pageSize=req.query.pageSize || 5;
+  console.log(req.body);
+  var searchName=req.body.searchname;
+  usersModule.searchUserInfo({
+      page:page,
+      pageSize:pageSize,
+      searchname:searchName
+    },function(err,data){
+      if(err){
+        res.render('zyerror',err);
+      }else{
+        console.log('按昵称搜索的结果为:'+data.userList);
+        res.render('user-manager',{
+          username:req.cookies.username,
+          nickname:req.cookies.nickname,
+          is_admin:parseInt(req.cookies.is_admin)?'(管理员)':'',
+          page:data.page,
+          userList:data.userList,
+          pageSize:pageSize,
+          totalpage:data.totalpage,
+        });
+      }
+    });
 });
 
 module.exports = router;

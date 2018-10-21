@@ -1,0 +1,49 @@
+.main{
+    padding:50px 0 0 30px;
+    position:relative;
+}
+.main .searchname{
+    border:none;
+    border:1px solid #B8C5D8;
+    border-radius:5px;
+    outline:none;
+    height:30px;
+    padding:10px;
+}
+.main .sub{
+    background:#E0EDFF;
+    width:50px;
+    height:30px;
+    border-radius:5px;
+    border:1px solid #E0EDFF;
+    margin-left:10px;
+    outline:none;
+}
+.main table{
+    margin-top:30px;
+    border:1;
+   
+}
+.main td{
+    border:1px solid #000;
+    padding:10px;
+    text-align:center;
+}
+.main ul{
+    position:absolute;
+    top:400px;
+    left:800px;
+    text-align:center;
+}
+.main ul li{
+    width:40px;
+    height:40px;
+    line-height:40px;
+    background:skyblue;
+    float:left;
+}
+.main ul li a{
+    display:inline-block;
+    height:40px;
+    width:40px;
+}

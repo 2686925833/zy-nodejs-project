@@ -99,9 +99,9 @@ const usersModule={
                    }else{
                         console.log('登录成功');
                         let userdata={
-                            username:data.username,
-                            nickname:data.nickname,
-                            is_admin:data.is_admin
+                            username:data[0].username,
+                            nickname:data[0].nickname,
+                            is_admin:data[0].is_admin
                         };
                         console.log('登录的用户信息为：'+userdata);
                     
@@ -113,7 +113,113 @@ const usersModule={
            }
        }); 
     },
+    //分页处理
+    getuserList(data,cb){
+        MongoClient.connect(url,function(err,client){
+            if(err){
+                cb({code:-100,msg:'连接数据库失败'});
+            }else{
+                const db=client.db('zy');
+                let limitNum=parseInt(data.pageSize);
+                let skipNum=data.page*data.pageSize-data.pageSize;
+                async.parallel([
+                    function(callback){
+                        //查询记录条数
+                        db.collection('user').find().count(function(err,num){
+                            if(err){
+                                console.log('查询记录条数时，连接数据库失败');
+                                callback({code:-100,msg:'连接数据库失败'});
+                            }else{
+                                callback(null,num);
+                            }
+                        });
+                    },
+                    function(callback){
+                        //查询分页数据
+                        db.collection('user').find().limit(limitNum).skip(skipNum).toArray(function(err,userList){
+                            if(err){
+                                console.log('查询分页数据时，连接数据库失败');
+                                callback({code:-100,msg:'连接数据库失败'});
+                            }else{
+                                callback(null,userList);
+                            }
+                        });
+                    }
+                ],function(err,result){
+                    if(err){
+                        cb(err);
+                    }else{
+                        cb(null,{
+                            totalpage:Math.ceil(result[0]/limitNum),
+                            userList:result[1],
+                            page:data.page
+                        });
+                    }
+                    client.close();
+                });
+            }
+        });
+    },
 
+
+    //根据昵称搜索用户
+    searchUserInfo(data,cb){
+        var searchdata=new RegExp(data.searchname);
+        console.log(searchdata);
+        MongoClient.connect(url,function(err,client){
+            if(err){
+                console.log('根据昵称搜索用户时，连接数据库失败');
+                cb({code:-100,msg:'连接数据库失败'});
+            }else{
+                const db=client.db('zy');
+                let limitNum=parseInt(data.pageSize);
+                let skipNum=data.page*data.pageSize-data.pageSize;
+                async.parallel([
+                    function(callback){
+                        //查询记录条数
+                        db.collection('user').find({nickname:searchdata}).count(function(err,num){
+                            if(err){
+                                console.log('查询记录条数时，连接数据库失败');
+                                callback({code:-100,msg:'连接数据库失败'});
+                            }else{
+                                callback(null,num);
+                            }
+                        });
+                    },
+                    function(callback){
+                        //查询分页数据
+                        db.collection('user').find({nickname:searchdata}).limit(limitNum).skip(skipNum).toArray(function(err,userList){
+                            if(err){
+                                console.log('查询分页数据时，连接数据库失败');
+                                callback({code:-100,msg:'连接数据库失败'});
+                            }else{
+                                callback(null,userList);
+                            }
+                        });
+                    }
+                ],function(err,result){
+                    if(err){
+                        cb(err);
+                    }else{
+                        cb(null,{
+                            totalpage:Math.ceil(result[0]/limitNum),
+                            userList:result[1],
+                            page:data.page
+                        });
+                    }
+                    client.close();
+                // db.collection('user').find({nickname:/searchdata/}).toArray(function(err,data){
+                //     if(err){
+                //         console.log('查询数据库失败');
+                //         cb({code:-100,msg:'查询数据库失败'});
+                //     }else{
+                //         cb(null,data);
+                //     }
+                //     client.close();
+                });
+            }
+        });
+    },
 
 };
 

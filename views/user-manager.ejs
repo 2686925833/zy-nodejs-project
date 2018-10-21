@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel='stylesheet' href='/css/index.css'>
+  <link rel='stylesheet' href='/css/reset.css'>
+  <link rel='stylesheet' href='/css/user-manager.css'>
+</head>
+<body>
+    <div class="index">
+        <%- include('./common/header.ejs',{username:username,nickname:nickname,is_admin:is_admin}) %>
+        <div class="container">
+            <%- include('./common/menu.ejs',{is_admin:is_admin}) %>
+            <div class=main>
+                <form action='/users/search' method='post'>
+                    <input type='text' placeholder="请输入昵称" name='searchname' class='searchname'>
+                    <input type='submit' value='搜索' class='sub'>
+                </form>
+                <table border:1>
+                    <thead>
+                        <tr>
+                            <td>序号</td>
+                            <td>用户名</td>
+                            <td>昵称</td>
+                            <td>年龄</td>
+                            <td>性别</td>
+                            <td>手机号</td>
+                            <td>是否管理员</td>
+                            <td>操作</td>
+                        </tr>
+                    </thead>
+                        <tbody>
+                            <% for(var i=0;i < userList.length;i++){ %>
+                                <tr>
+                                    <td><%= userList[i]._id %></td>
+                                    <td><%= userList[i].username %></td>
+                                    <td><%= userList[i].nickname %></td>
+                                    <td><%= userList[i].age || '-' %></td>
+                                    <td><%= userList[i].sex || '-' %></td>
+                                    <td><%= userList[i].phone || '-' %></td>
+                                    <td><%= parseInt(userList[i].is_admin)? '是' :'否' %></td>
+                                    <td>
+                                        <% if(userList[i].username===username){ %>
+                                            <a href='#'>修改</a>
+                                        <% }else if(parseInt(userList[i].is_admin)){ %>
+                                              
+                                        <% }else{ %>
+                                            <a href='#'>修改</a>
+                                            <a href='#'>删除</a>
+                                        <% } %>
+                                       
+                                    </td>
+                                </tr>
+                            <% } %>
+                            
+                        </tbody>
+                   
+                </table>
+               
+                <ul>
+                    <% for(var j=0;j < totalpage; j++){ %>
+                        <li>
+                            <a href='/user-manager.html?page=<%= j+1 %>'><%= j+1 %></a>
+                        </li>
+                    <% } %>
+                </ul>
+               
+            </div>
+        </div>
+    </div>
+</body>
+</html>
