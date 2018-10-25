@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel='stylesheet' href='/css/index.css'>
+    <link rel='stylesheet' href='/css/reset.css'>
+    <link rel='stylesheet' href='/css/mobile-manager.css'>
+</head>
+<body>
+    <div class="index">
+        <%- include('./common/header.ejs',{username:username,nickname:nickname,is_admin:is_admin}) %>
+        <div class="container">
+            <%- include('./common/menu.ejs',{is_admin:is_admin}) %>
+            <div class=main>
+                <div class="add">新增手机</div>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>图片</th>
+                                <th>手机名称</th>
+                                <th>所属品牌</th>
+                                <th>官方指导价</th>
+                                <th>二手回收价</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                        </tbody>
+                    </table>
+                    <ul class="page">
+                        
+                    </ul>
+                </div>
+                <div class="addMobile">
+                    <p>新增</p>
+                    <!-- <form  method="post" enctype='multipart/form-data'> -->
+                        <div class="id_none">
+                            <label>序号:</label>
+                            <input type="text" name="_id" class="_id">
+                        </div>
+                        <div>
+                            <label>图片:</label>
+                            <input type="file" name="mobile" class="mobile">
+                        </div>
+                        <div>
+                            <label>手机名称:</label>
+                            <input type="text" name="mobilename" class="mobilename">
+                        </div>
+                        <div>
+                            <label>所属品牌:</label>
+                            <select name="brand" id="brand">
+                                <option>苹果</option>
+                                <option>华为</option>
+                                <option>小米</option>
+                                <option>荣耀</option>
+                                <option>三星</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>官方指导价:</label>
+                            <input type="text" name="oneprice" class="oneprice">
+                        </div>
+                        <div>
+                            <label>二手回收价:</label>
+                            <input type="text" name="twoprice" class="twoprice">
+                        </div>
+                        <div>
+                            <button class="submit" id="sure">确定</button>
+                            <span class="submit">取消</span>
+                        </div>
+                    <!-- </form> -->
+                </div>
+                <div class="updata ">
+                    <p>修改</p>
+                    <!-- <form  method="post" enctype='multipart/form-data'> -->
+                        <div class="id_none">
+                            <label>序号:</label>
+                            <input type="text" name="updata_id" class="_id">
+                        </div>
+                        <div>
+                            <label>图片:</label>
+                            <input type="file" name="updatamobile" class="mobile">
+                        </div>
+                        <div>
+                            <label>手机名称:</label>
+                            <input type="text" name="updatamobilename" class="mobilename">
+                        </div>
+                        <div>
+                            <label>所属品牌:</label>
+                            <select name="brand" id="updatabrand">
+                            
+                            </select>
+                        </div>
+                        <div>
+                            <label>官方指导价:</label>
+                            <input type="text" name="updataoneprice" class="oneprice">
+                        </div>
+                        <div>
+                            <label>二手回收价:</label>
+                            <input type="text" name="updatatwoprice" class="twoprice">
+                        </div>
+                        <div>
+                            <button class="queding">确定</button>
+                            <span class="cacle">取消</span>
+                        </div>
+                    <!-- </form> -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script src='/lib/jquery/jquery.min.js'></script>
+<script>
+    $(".add").click(function(){
+        $(".addMobile").css("display","block");
+
+    });
+    $(".addMobile span").click(function(){
+        $(".addMobile").css("display","none");
+    });
+    $(".addMobile #sure").click(function(){
+        var mobilepath=$(".addMobile .mobile").get(0).files[0];
+        var mobilename=$(".addMobile .mobilename").val();
+        var brand=$(".addMobile #brand").val();
+        var oneprice=$(".addMobile .oneprice").val();
+        var twoprice=$(".addMobile .twoprice").val();
+        var fileForm=new FormData();
+        fileForm.append('mobile',mobilepath);
+        fileForm.append('mobilename',mobilename);
+        fileForm.append('brand',brand);
+        fileForm.append('oneprice',oneprice);
+        fileForm.append('twoprice',twoprice);
+        var data = fileForm;
+        if(typeof mobilepath=='undefined' || mobilepath.size<=0){
+            alert('请选择图片');
+        }else{
+            $.ajax({
+                type:'post',
+                url:'/mobile/addMobile',
+                data:data,
+                cach: false, //上传文件无需缓存
+                processData: false,  //用于对data参数进行序列化处理 这里必须false
+                contentType: false, //必须写
+                success:function(res){
+                    console.log(res);
+                    alert('添加成功');
+                    //循环添加数据
+                }
+            });
+            $(".addMobile").css("display","none");
+        }   
+    });
+    //分页 循环添加数据
+    var page=1;
+    var pageSize=2;
+    var str;
+    var html;
+    getList();
+    function getList(){
+
+        $.ajax({
+            type:'get',
+            url:'/mobile/search',
+            data:{
+                page:page,
+            },
+            success:function(res){
+                console.log(res);
+                str='';
+                for(var i=0;i<res.mobileList.length;i++){
+                    str+=`<tr>
+                            <th>${res.mobileList[i]._id}</th>
+                            <th>
+                                <img src='${res.mobileList[i].mobilepath}'>
+                            </th>
+                            <th>${res.mobileList[i].mobilename}</th>
+                            <th>${res.mobileList[i].mobilebrand}</th>
+                            <th>${res.mobileList[i].oneprice}</th>
+                            <th>${res.mobileList[i].twoprice}</th>
+                            <th>
+                                <a class="updateMobile">修改</a>
+                                <a class="deleteMobile">删除</a>
+                            </th>
+                        </tr>`;
+                        
+                }
+                html='';
+                for(var j=0;j<parseInt(res.totalPage);j++){
+                    html +=`<li><a>${j+1}</a></li>`;
+                }
+                $("table tbody").html(str);
+                $(".page").html(html);
+            },
+    
+        });
+    }
+    //点击页数
+    $(".page").on('click','li',function(){
+        page=$(this).find('a').html();
+        getList();
+    });
+    //修改
+    $("tbody").on('click','.updateMobile',function(e){
+        e.stopPropagation();
+        $(".updata").show();
+        console.log($(this).parent().parent().find('th').eq(2).html());
+        $(".updata ._id").val($(this).parent().parent().find('th').eq(0).html());
+        $(".updata .mobilename").val($(this).parent().parent().find('th').eq(2).html());
+        $(".updata #brand").val($(this).parent().parent().find('th').eq(3).html());
+        $(".updata .oneprice").val($(this).parent().parent().find('th').eq(4).html());
+        $(".updata .twoprice").val($(this).parent().parent().find('th').eq(5).html());
+       
+    });
+    //修改数据库
+    $(".queding").click(function(e){
+        $(".updata").hide();
+        e.stopPropagation();
+        var updata_id=$(".updata ._id").val();
+        var updatamobilename=$(".updata .mobilename").val();
+        var updatamobile=$(".updata .mobile").get(0).files[0];
+        var updatabrand=$(".updata #brand").val();
+        var updataoneprice=$(".updata .oneprice").val();
+        var updatatwoprice=$(".updata .twoprice").val();
+        var fileForm=new FormData();
+        fileForm.append('updata_id',updata_id);
+        fileForm.append('updatamobile',updatamobile);
+        fileForm.append('updatamobilename',updatamobilename);
+        fileForm.append('updatabrand',updatabrand);
+        fileForm.append('updataoneprice',updataoneprice);
+        fileForm.append('updatatwoprice',updatatwoprice);
+        console.log('updatamobile'+updatamobile);         
+        if(typeof updatamobile=='undefined' || updatamobile.size<=0){
+            alert('请选择新的图片');
+            return;
+        }
+
+        $.ajax({
+            type:'post',
+            url:'/mobile/updata',
+            data:fileForm,
+            cach: false, //上传文件无需缓存
+            processData: false,  //用于对data参数进行序列化处理 这里必须false
+            contentType: false, //必须写
+            success:function(res){
+                getList();
+                alert('修改成功');
+            }
+
+        });    
+    });   
+  
+    //取消修改
+    $(".cacle").click(function(){
+        $(".updata").hide();
+    });
+    //删除
+    $("tbody").on('click','.deleteMobile',function(){
+        var deleteId=parseInt($(this).parent().parent().find('th').eq(0).html());
+        $.ajax({
+            type:'get',
+            url:'/mobile/delete',
+            data:{
+                id:deleteId,
+            },
+            success:function(res){
+                getList();
+                alert('删除成功');
+            },
+        });
+    });
+    //品牌
+    $('#updatabrand').click(function(){
+        $.ajax({
+            type:'post',
+            url:'/mobile/brand',
+            success:function(res){
+                console.log(res);
+                var brand='';
+                for(var s=0;s<res.length;s++){
+                    brand+=`<option>${res[s].brandname}</option>`;
+                }
+                $("#updatabrand").html(brand);
+            },
+        });
+    });
+
+
+</script>

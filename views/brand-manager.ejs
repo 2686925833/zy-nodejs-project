@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel='stylesheet' href='/css/index.css'>
+    <link rel='stylesheet' href='/css/reset.css'>
+    <link rel='stylesheet' href='/css/brand-manager.css'>
+</head>
+<body>
+    <div class="index">
+        <%- include('./common/header.ejs',{username:username,nickname:nickname,is_admin:is_admin}) %>
+        <div class="container">
+            <%- include('./common/menu.ejs',{is_admin:is_admin}) %>
+            <div class=main>
+                <div class="add">新增品牌</div>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>品牌LOGO</th>
+                                <th>品牌名称</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                        </tbody>
+                    </table>
+                    <ul class="page">
+                        
+                    </ul>
+                </div>
+                <div class="addBrand">
+                    <p>新增品牌</p>
+                        <div>
+                            <label>品牌LOGO:</label>
+                            <input type="file" name="brand" class="brand">
+                        </div>
+                        <div>
+                            <label>品牌名称:</label>
+                            <input type="text" name="brandname" class="brandname">
+                        </div>
+                        <div>
+                            <button id="submit">确定</button>
+                            <span id="cancel">取消</span>
+                        </div>
+                </div>
+                <div class="updata">
+                        <p>修改品牌</p>
+                            <div class="id_none">
+                                <label>序号:</label>
+                                <input type="text" name="_id" class="_id">
+                            </div>
+                            <div>
+                                <label>品牌LOGO:</label>
+                                <input type="file" name="updatabrand" class="updatabrand">
+                            </div>
+                            <div>
+                                <label>品牌名称:</label>
+                                <input type="text" name="updatabrandname" class="updatabrandname">
+                            </div>
+                            <div>
+                                <button class="queding">确定</button>
+                                <span class="cancel">取消</span>
+                            </div>
+                    </div>
+            </div>
+        </div>
+    </div>   
+</body>
+</html>
+<script src='/lib/jquery/jquery.min.js'></script>
+<script>
+    var page=parseInt(location.search.split("=")[1]) || 1;
+    getList();
+    $(".add").click(function(){
+        $(this).css('color','red');
+        $(".addBrand").show();
+    });
+    $(".addBrand #submit").click(function(){
+        $(this).css('color','red');
+        var brandPath=$(".addBrand .brand").get(0).files[0];
+        var brandName=$(".addBrand .brandname").val();
+        console.log('brandPath'+brandPath);
+        fileForm=new FormData();
+        fileForm.append('brand',brandPath);
+        fileForm.append('brandname',brandName);
+        if(typeof brandPath=='undefined' || brandPath.size<=0){
+            alert('请选择品牌LOGO图');
+        }else{
+            $.ajax({
+                type:'post',
+                url:'/brand/add',
+                data:fileForm,
+                cach: false, //上传文件无需缓存
+                processData: false,  //用于对data参数进行序列化处理 这里必须false
+                contentType: false, //必须写
+                success:function(res){
+                    if(res.code===0){
+                        alert('添加成功');
+                        $(".addBrand").hide();
+                        getList();
+                    }else{
+                        alert('添加失败');
+                    }
+                }
+            });
+        }
+    });
+    $(".addBrand #cancel").click(function(){
+        $(this).css('color','red');
+        $(".addBrand").hide();
+    });
+    function getList(){
+        console.log('%%%%%%%%%');
+        $.ajax({
+            type:'get',
+            url:'/brand/search',
+            data:{
+                page:page,
+            },
+            success:function(res){
+                console.log(res);
+                var str='';
+                for(var i=0;i<res.brandList.length;i++){
+                    str+=`<tr>
+                        <th>${res.brandList[i]._id}</th>
+                        <th><img src='${res.brandList[i].brandsrc}'></th>
+                        <th>${res.brandList[i].brandname}</th>
+                        <th>
+                            <a class="updatabrand">修改</a>
+                            <a class="delete">删除</a>
+                        </th>
+                        </tr>`;
+                }
+                var html='';
+                for(var j=0;j<parseInt(res.totalpage);j++){
+                    html+=`<li><a>${j+1}</a></li>`;
+                }
+                $("table tbody").html(str);
+                $(".page").html(html);
+            }
+        });
+    }
+    //点击页数
+    $(".page").on('click','li',function(){
+        $(this).css('color','red');
+        page=$(this).find('a').html();
+        getList();
+    });
+    //修改
+    $("tbody").on('click','.updatabrand',function(){
+        $(this).css('color','red');
+        console.log('进来了');
+        $(".updata").show();
+        $(".updata ._id").val($(this).parent().parent().find('th').eq(0).html());
+        $(".updata .updatabrandname").val($(this).parent().parent().find('th').eq(2).html());
+        
+    });
+    $(".cancel").click(function(){
+        $(".updata").hide();
+    });
+    $(".queding").click(function(){
+        $(".updata").hide();
+        var _id=$(".updata ._id").val();
+        var updatabrand=$(".updata .updatabrand").get(0).files[0];
+        var updatabrandname=$(".updata .updatabrandname").val();
+        var fileForm=new FormData();
+        fileForm.append('_id',_id);
+        fileForm.append('updatabrand',updatabrand);
+        fileForm.append('updatabrandname',updatabrandname);
+
+        if(typeof updatabrand=="undefined" || updatabrand.size<=0){
+            alert('请重新选择图片');
+        }else{
+            $.ajax({
+                type:'post',
+                url:'/brand/updata',
+                data:fileForm,
+                cach: false, //上传文件无需缓存
+                processData: false,  //用于对data参数进行序列化处理 这里必须false
+                contentType: false, //必须写
+                success:function(res){
+                    getList();
+                    alert('修改成功');
+                }
+            });
+        }
+    });
+    //删除
+    $("tbody").on('click','.delete',function(){
+        $(this).css('color','red');
+        var deleteId=parseInt($(this).parent().parent().find('th').eq(0).html());
+        $.ajax({
+            type:'get',
+            url:'/brand/delete',
+            data:{
+                _id:deleteId,
+            },
+            success:function(res){
+                getList();
+                alert('删除成功');
+            }
+        });
+    });
+</script>

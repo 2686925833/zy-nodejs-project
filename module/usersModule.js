@@ -26,7 +26,7 @@ const usersModule={
                 };
                 console.log(savedata);
                 //判断用户是否注册
-
+                var Lastdata_id;
                 async.series([
                     function(callback){
                         //判断用户是否注册
@@ -43,21 +43,30 @@ const usersModule={
                             }
                          });
                     },
+
+                    //设置_id字段
                     function(callback){
-                        //设置_id字段
-                        db.collection('user').find().count(function(err,num){
+                        db.collection('user').find().toArray(function(err,data){
                             if(err){
-                                callback({code:-101,msg:'查询用户所有记录条数失败'});
+                                console.log('设置_id字段过程中，查询数据库失败');
+                                callback({code:-100,msg:'设置_id字段过程中，查询数据库失败'});
                             }else{
-                                savedata._id=num+1;
+                                console.log(data);
+                                Lastdata_id=data[data.length-1]._id+1;
+                                savedata._id=Lastdata_id;
+                                console.log(Lastdata_id);
                                 callback(null);
                             }
                         });
                     },
+                    
                     function(callback){
                         //做添加操作
+
                         db.collection('user').insertOne(savedata,function(err){
                             if(err){
+                                console.log('savedata'+savedata);
+                                console.log('写入数据库失败');
                                 callback({code:-101,msg:'写入数据库失败'});
                             }else{
                                 callback(null);
@@ -99,6 +108,7 @@ const usersModule={
                    }else{
                         console.log('登录成功');
                         let userdata={
+                            _id:data[0]._id,
                             username:data[0].username,
                             nickname:data[0].nickname,
                             is_admin:data[0].is_admin
@@ -208,18 +218,58 @@ const usersModule={
                         });
                     }
                     client.close();
-                // db.collection('user').find({nickname:/searchdata/}).toArray(function(err,data){
-                //     if(err){
-                //         console.log('查询数据库失败');
-                //         cb({code:-100,msg:'查询数据库失败'});
-                //     }else{
-                //         cb(null,data);
-                //     }
-                //     client.close();
                 });
             }
         });
     },
+
+
+    //删除用户
+    userDelete(data,cb){
+        MongoClient.connect(url,function(err,client){
+            if(err){
+                cb({code:-100,msg:'删除用户时，连接数据库失败'});
+            }else{
+                const db=client.db('zy');
+                db.collection('user').remove({_id:parseInt(data)},function(err){
+                    if(err){
+                        console.log('删除用户失败');
+                        cb({code:-101,msg:'删除用户失败'});
+                    }else{
+                        cb(null);
+                    }
+                });
+            }
+        });
+    },
+
+    //修改用户的信息
+    userupdataAfter(data,cb){
+        //
+       
+        //
+        MongoClient.connect(url,function(err,client){
+            if(err){
+                console.log('修改用户的信息时,连接数据库失败');
+                cb({code:-100,msg:'连接数据库失败'});
+            }
+            const db=client.db('zy')
+            db.collection('user').update({_id:parseInt(data._id)},{$set:{
+                nickname:data.nickname,
+                age:data.age,
+                sex:data.sex,
+                phone:data.phone,
+                is_admin:data.is_admin
+            }},function(err){
+                if(err){
+                    cb({code:-101,msg:'修改用户信息失败'});
+                }else{
+                    cb(null);
+                }
+            });
+        });
+    },
+    
 
 };
 

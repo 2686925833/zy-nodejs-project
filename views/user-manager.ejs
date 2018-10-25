@@ -15,7 +15,7 @@
         <div class="container">
             <%- include('./common/menu.ejs',{is_admin:is_admin}) %>
             <div class=main>
-                <form action='/users/search' method='post'>
+                <form action='/user-search' method='get'>
                     <input type='text' placeholder="请输入昵称" name='searchname' class='searchname'>
                     <input type='submit' value='搜索' class='sub'>
                 </form>
@@ -44,26 +44,29 @@
                                     <td><%= parseInt(userList[i].is_admin)? '是' :'否' %></td>
                                     <td>
                                         <% if(userList[i].username===username){ %>
-                                            <a href='#'>修改</a>
+                                            <a class="updataBtn">修改</a>
                                         <% }else if(parseInt(userList[i].is_admin)){ %>
                                               
                                         <% }else{ %>
-                                            <a href='#'>修改</a>
-                                            <a href='#'>删除</a>
+                                            <a class="updataBtn">修改</a>
+                                            <a href='/user-delete?_id=<%= userList[i]._id %>'>删除</a>
                                         <% } %>
                                        
                                     </td>
                                 </tr>
                             <% } %>
                             
-                        </tbody>
-                   
+                        </tbody>                   
                 </table>
                
                 <ul>
                     <% for(var j=0;j < totalpage; j++){ %>
                         <li>
-                            <a href='/user-manager.html?page=<%= j+1 %>'><%= j+1 %></a>
+                            <% if(searchname){%>
+                                <a href='/user-search?searchname=<%= searchname %>&page=<%= j+1 %>'><%= j+1 %></a>
+                            <% }else{ %>
+                                <a href='/user-manager.html?page=<%= j+1 %>'><%= j+1 %></a>
+                            <% } %>
                         </li>
                     <% } %>
                 </ul>
@@ -71,5 +74,47 @@
             </div>
         </div>
     </div>
+   
+    <div class='updata'>
+        <p class='head'>修改用户的信息</p>
+        <form action="/user-updataAfter" method='post'>
+            <div class="id_none" >
+                <label>序号:</label>
+                <input type='text' name='_id' class='text _id' >
+            </div>
+            <div>
+                <label>用户名:</label>
+                <input type='text' name='username' class='text username' readonly='readonly'>
+            </div>
+            <div >
+                <label>昵称:</label>
+                <input type='text' name='nickname' class='text nickname' >
+            </div>
+            <div>
+                <label>年龄:</label>
+                <input type='text' name='age' class='text age' >
+            </div>
+            <div>
+                <label>性别:</label>
+                <input type='text' name='sex' class='text sex' >
+            </div>
+            <div>
+                <label>手机号:</label>
+                <input type='text' name='phone' class='text phone' >
+            </div>
+            <div>
+                <label>管理员:</label>
+                <input type='radio' name='is_admin' value='1'>yes
+                <input type='radio' name='is_admin' value='0' checked>no
+            </div>
+            <div class='button'>
+                <input type='submit' value='确定' class="submit">
+                <span class="submit">取消</span>
+            </div>
+        </form>
+    </div>
+   
 </body>
 </html>
+<script src='lib/jquery/jquery.min.js'></script>
+<script src='js/user_manager.js'></script>

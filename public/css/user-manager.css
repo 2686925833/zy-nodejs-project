@@ -31,8 +31,8 @@
 }
 .main ul{
     position:absolute;
-    top:400px;
-    left:800px;
+    top:460px;
+    left:860px;
     text-align:center;
 }
 .main ul li{
@@ -41,9 +41,63 @@
     line-height:40px;
     background:skyblue;
     float:left;
+    margin-right:6px;
+    border:1px solid skyblue;
 }
 .main ul li a{
     display:inline-block;
     height:40px;
     width:40px;
+}
+
+/* 更改信息部分的样式 */
+.updata{
+    width:400px;
+    height:480px;
+    border:1px solid #000;
+    position:absolute;
+    background:url(/images/background.jpg);
+    z-index:2;
+    left:40%;
+    top:18%;
+    padding:20px;
+    display:none;
+}
+.updata .head{
+    text-align:center;
+    font-size:30px;
+    padding:0px 0 20px 0;
+}
+.updata div{
+    margin-bottom:20px;
+    font-size:18px;
+}
+.updata input{
+    border:0;
+    border:1px solid skyblue;
+}
+.updata label{
+    width:90px;
+    float:left;
+    text-align:right;
+    margin-right:20px;
+}
+.updata .text{
+    width:194px;
+    height:30px;
+    padding-left:6px
+}
+.updata input[type='radio']{
+    margin:0 4px 0 16px;
+}
+.updata .button .submit {
+    display:inline-block;
+    padding:8px 14px;
+    text-align:center;
+    background:skyblue;
+    margin:32px 30px 0 66px;
+    font-size:18px;
+}
+.updata .id_none{
+    display:none;
 }
