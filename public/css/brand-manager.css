@@ -74,10 +74,10 @@ table th{
     width:40px;
     height:40px;
     line-height:40px;
-    background:skyblue;
+    background:#ccc;
     float:left;
     margin-right:6px;
-    border:1px solid skyblue;
+    margin-bottom:10px;
 }
 .main ul li a{
     display:inline-block;
@@ -86,4 +86,7 @@ table th{
 }
 img {
     width:100px;
+}
+ul.page li:nth-of-type(1){
+    backgroun:skyblue;
 }

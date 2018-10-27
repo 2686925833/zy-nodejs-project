@@ -1,9 +1,4 @@
-$('.menu_item').click(function(){
-    $(this).css('background','red');
-});
-$('.main ul li').click(function(){
-    $(this).css('border-color','red');
-});
+
 $('.updataBtn').click(function(){
     $('.updata').css('display','block');
     console.log($(this).parent().parent().html());
@@ -16,4 +11,10 @@ $('.updataBtn').click(function(){
 });
 $('span.submit').click(function(){
     $('.updata').css('display','none');
+});
+$('.user').css('background','skyblue');
+$(document).ready(function(){
+    var index=location.href.split('&')[0].split('=')[1]-1;
+    console.log('index'+index);
+    $('.page li').eq(index).css('background','skyblue').siblings().css('background','#ccc');
 });

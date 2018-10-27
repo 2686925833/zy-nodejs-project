@@ -202,10 +202,47 @@
     
         });
     }
+    //
+    function getLists(){
+
+        $.ajax({
+            type:'get',
+            url:'/mobile/search',
+            data:{
+                page:page,
+            },
+            success:function(res){
+                console.log(res);
+                str='';
+                for(var i=0;i<res.mobileList.length;i++){
+                    str+=`<tr>
+                            <th>${res.mobileList[i]._id}</th>
+                            <th>
+                                <img src='${res.mobileList[i].mobilepath}'>
+                            </th>
+                            <th>${res.mobileList[i].mobilename}</th>
+                            <th>${res.mobileList[i].mobilebrand}</th>
+                            <th>${res.mobileList[i].oneprice}</th>
+                            <th>${res.mobileList[i].twoprice}</th>
+                            <th>
+                                <a class="updateMobile">修改</a>
+                                <a class="deleteMobile">删除</a>
+                            </th>
+                        </tr>`;
+                        
+                }
+            
+                $("table tbody").html(str);
+            
+            },
+
+        });
+}
     //点击页数
     $(".page").on('click','li',function(){
         page=$(this).find('a').html();
-        getList();
+        getLists();
+        $(this).css('background','skyblue').siblings().css('background','#ccc');
     });
     //修改
     $("tbody").on('click','.updateMobile',function(e){
@@ -290,7 +327,14 @@
                 $("#updatabrand").html(brand);
             },
         });
-    });
-
+    }); 
+    // 
+    $(document).ready(function(){
+        var str=location.href;
+        var reg=RegExp(/mobile-manager/);
+        if(str.match(reg)){
+            $('.mobile').addClass('now');
+        }
+    })
 
 </script>

@@ -146,11 +146,39 @@
             }
         });
     }
+    //
+    function getLists(){
+        console.log('%%%%%%%%%');
+        $.ajax({
+            type:'get',
+            url:'/brand/search',
+            data:{
+                page:page,
+            },
+            success:function(res){
+                console.log(res);
+                var str='';
+                for(var i=0;i<res.brandList.length;i++){
+                    str+=`<tr>
+                        <th>${res.brandList[i]._id}</th>
+                        <th><img src='${res.brandList[i].brandsrc}'></th>
+                        <th>${res.brandList[i].brandname}</th>
+                        <th>
+                            <a class="updatabrand">修改</a>
+                            <a class="delete">删除</a>
+                        </th>
+                        </tr>`;
+                }
+                $("table tbody").html(str);
+               
+            }
+        });
+    }
     //点击页数
     $(".page").on('click','li',function(){
-        $(this).css('color','red');
+        $(this).css('background','skyblue').siblings().css('background','#ccc');
         page=$(this).find('a').html();
-        getList();
+        getLists();
     });
     //修改
     $("tbody").on('click','.updatabrand',function(){
@@ -207,4 +235,5 @@
             }
         });
     });
+    $('.brand').css('background','skyblue');
 </script>
